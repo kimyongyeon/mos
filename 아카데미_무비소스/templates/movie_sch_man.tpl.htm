@@ -1,0 +1,30 @@
+<html>
+<link href="../css/global.css" rel="stylesheet" type="text/css">
+<table width="750" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+	 <td>
+			<table width="673" align="center" cellpadding="5" cellspacing="1" bgcolor="cccccc">
+			  <tr>
+			    <td width="64" align="center" bgcolor="#efefef" class="title01b"> 순번</td>
+			    <td width="70" align="center" bgcolor="#efefef" class="title01b"> 동영상ID</td>
+			    <td width="271" align="center" bgcolor="#efefef" class="title01b"> 강의명</td>
+			    <td width="131" align="center" bgcolor="#efefef" class="title01b"> 수강계획일</td>
+			    <td width="81" align="center" bgcolor="#efefef" class="title01b"> 관리</td>
+			  </tr>
+			  <!-- BEGIN row -->
+			  <tr>
+			  	<form method = "post" action = "/movie_sch_update_ok.php">
+			  	<input type="hidden" name="p_seq" value="{P_SEQ}">	
+			  	<input type="hidden" name="p_movie_seq" value="{P_MOVIE_SEQ}">
+			    <td width="64" align="center" bgcolor="#FFFFFF">{SEQ}</td>
+			    <td width="70" align="center" bgcolor="#FFFFFF">{MOVIE_ID}</td>
+			    <td width="271" align="center" bgcolor="#FFFFFF">{TITLE}</td>
+			    <td width="131" align="center" bgcolor="#FFFFFF"><input type = "text" name = "p_plan_ilsi"  value = "{PLAN_ILSI}" maxlength="10" size="10"></td>
+			    <td width="81" align="center" bgcolor="#FFFFFF"><input type = "submit" value = "수정"><a href="{SCRIPT_DELETE}">삭제</a></td>
+			    </form>
+			  </tr>
+			  <!-- END row -->
+			</table></td>
+	</tr>
+</table>			
+</html> 

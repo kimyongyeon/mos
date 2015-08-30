@@ -1,0 +1,34 @@
+<html>
+<link href="../css/global.css" rel="stylesheet" type="text/css">
+
+<form name="frm" action="/index.php?html=apps/exam/exam_rec_by_no" method="post">
+<font size=2 color=black face="굴림체"> 회차</font>
+<select name= "dept_no" onchange="frm.submit();">
+<Option value="dp00">선택하세요</Option>
+<Option value="dp01">1회</Option>
+<Option value="dp02">2회</Option> 
+<Option value="dp03">3회</Option> 
+<Option value="dp04">4회</Option> 
+<Option value="dp05">5회</Option>
+</select>
+<font size=2 color=black face="굴림체">{EXAM_NO}회</font>
+
+<table width="720" cellpadding="5" cellspacing="1" bgcolor="cccccc">
+  <tr>
+    <td width="50" align="center" bgcolor="efefef" class="title01b"> NO</td>
+    <td width="277" align="center" bgcolor="efefef" class="title01b"> 이름</td>
+    <td width="89" align="center" bgcolor="efefef" class="title01b"> 점수</td>
+    <td width="144" align="center" bgcolor="efefef" class="title01b"> 합격유무</td>
+  </tr>
+  <!-- BEGIN row -->
+  <tr>
+    <td width="50" align="center" bgcolor="ffffff"> {SEQ}</td>
+    <td width="277" align="center" bgcolor="ffffff">{USER_NAME}</td>
+    <td width="89" align="center" bgcolor="ffffff"> {EXAM_JUMSU}</td>
+    <td width="144" align="center" bgcolor="ffffff"> {EXAM_PASS}</td>
+	<input type=hidden value={CLASS_ID} name="p_class_id">
+  </tr>
+  <!-- END row -->
+</table>
+</form>
+</html> 

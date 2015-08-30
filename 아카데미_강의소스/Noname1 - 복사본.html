@@ -1,0 +1,67 @@
+<html>
+<link href="../css/global.css" rel="stylesheet" type="text/css">
+
+<form name="frm" action="/index.php?html=apps/exam/exam_rec_by_no" method="post">
+<font size=2 color=black face="굴림체"> 회차</font>
+<select name= "dept_no" onchange="frm.submit();">
+<Option value="dp00">선택하세요</Option>
+<Option value="dp01">1회</Option>
+<Option value="dp02">2회</Option> 
+<Option value="dp03">3회</Option> 
+<Option value="dp04">4회</Option> 
+<Option value="dp05">5회</Option>
+</select>
+<font size=2 color=black face="굴림체">{EXAM_NO}</font>
+
+<table width="720" cellpadding="5" cellspacing="1" bgcolor="cccccc">
+  <tr>
+    <td width="50" align="center" bgcolor="efefef" class="title01b"> NO</td>
+    <td width="277" align="center" bgcolor="efefef" class="title01b"> 이름</td>
+    <td width="89" align="center" bgcolor="efefef" class="title01b"> 점수</td>
+    <td width="144" align="center" bgcolor="efefef" class="title01b"> 합격유무</td>
+  </tr>
+  <!-- BEGIN row -->
+  <tr>
+    <td width="50" align="center" bgcolor="ffffff"> {SEQ}</td>
+    <td width="277" align="center" bgcolor="ffffff">{USER_NAME}</td>
+    <td width="89" align="center" bgcolor="ffffff"> {EXAM_JUMSU}</td>
+    <td width="144" align="center" bgcolor="ffffff"> {EXAM_PASS}</td>
+    <td width="144" align="center" bgcolor="ffffff"> {EXAM_NO}</td>	   
+	<input type=hidden value={CLASS_ID} name="p_class_id">
+  </tr>
+  <!-- END row -->
+</table>
+</form>
+</html> 
+
+
+SELECT e.SEQ, e.BOOK_TITLE, r.EXAM_PASS, z.name 
+FROM TB_EXAM e, TB_EXAM_SCH s, zetyx_member_table z  
+LEFT JOIN TB_EXAM_REC r ON s.SEQ = r.EXAM_SCH_SEQ 
+AND r.USER_ID   = 'toyongyeon'                       
+WHERE s.EXAM_SEQ = e.SEQ  
+AND s.CLASS_ID  = '2010_SCNU_MP001'     
+AND SELECT name from zetyx_member_table z where z.userid = 'toyongyeon'
+
+
+select name from zetyx_member_table z
+where z.userid = 'toyongyeon'
+
+SELECT e.BOOK_TITLE, s.PLAN_ILSI, s.SEQ, e.SEQ 
+FROM TB_EXAM e 
+LEFT JOIN TB_EXAM_SCH s ON s.EXAM_SEQ = e.SEQ 
+AND s.CLASS_ID = '2010_SCNU_MP001' ;
+
+SELECT e.BOOK_TITLE, s.PLAN_ILSI, s.SEQ, e.SEQ FROM TB_EXAM e LEFT JOIN TB_EXAM_SCH s ON s.EXAM_SEQ = e.SEQ AND s.CLASS_ID = '2010_SCNU_MP001' 
+
+
+SELECT r.USER_ID, m.MOVIE_ID, r.VIEW_START, r.VIEW_END
+FROM TB_MOVIE_REC r, TB_MOVIE_SCH s, TB_MOVIE m
+WHERE r.MOVIE_SCH_SEQ = s.SEQ
+AND s.MOVIE_SEQ     = m.SEQ
+AND r.MOVIE_SCH_SEQ = $p_seq;
+
+SELECT m.MOVIE_ID, m.TITLE, s.PLAN_ILSI, s.SEQ, m.SEQ 
+FROM TB_MOVIE m
+LEFT JOIN TB_MOVIE_SCH s ON s.MOVIE_SEQ = m.SEQ
+AND s.CLASS_ID = '$p_class_id';

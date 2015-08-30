@@ -1,0 +1,5 @@
+start   : http://www.academysoft.kr/apps/exam/exam_state_reg_proc.php?p_command=start&p_bookid=2010_M3PC1&p_examid=E1&p_userid=toyongyeon&p_examlgubun=POWERPOINT2003&p_examsgubun=CORE 
+skip    : http://www.academysoft.kr/apps/exam/exam_state_reg_proc.php?p_command=skip&p_bookid=2010_M3PC1&p_examid=E1&p_userid=toyongyeon&p_examlgubun=POWERPOINT2003&p_examsgubun=CORE&p_skipno=9
+next    : http://www.academysoft.kr/apps/exam/exam_state_reg_proc.php?p_command=next&p_bookid=2010_M3PC1&p_examid=E1&p_userid=toyongyeon&p_examlgubun=POWERPOINT2003&p_examsgubun=CORE&p_curqstseq=9&p_examwrong=true&p_curjumsu=20
+ing     : http://www.academysoft.kr/apps/exam/exam_ing_reg_proc.php?p_bookid=2010_M3PC1&p_examid=E1&p_userid=toyongyeon&p_examlgubun=POWERPOINT2003&p_examsgubun=CORE&p_elapsedtime=20100117090000
+request : http://www.academysoft.kr/apps/exam/exam_state_request_proc.php?p_bookid=2010_M3PC1&p_examid=E1&p_userid=toyongyeon&p_examlgubun=POWERPOINT2003&p_examsgubun=CORE

@@ -1,0 +1,64 @@
+<SCRIPT LANGUAGE="Javascript"> 
+function change(country) 
+{ 
+  if (country == 1 ) 
+  { 
+    document.main["city[]"][0].options.length=0 
+    document.main["city[]"][0].options[0]=new Option("서울") 
+    document.main["city[]"][0].options[0].value="1" 
+    document.main["city[]"][0].options[1]=new Option("대전") 
+    document.main["city[]"][0].options[1].value="2" 
+    document.main["city[]"][0].options[2]=new Option("대구") 
+    document.main["city[]"][0].options[2].value="3" 
+  } 
+  if (country == 2 ) 
+  { 
+    document.main["city[]"][0].options.length=0 
+    document.main["city[]"][0].options[0]=new Option("도쿄") 
+    document.main["city[]"][0].options[0].value="1" 
+    document.main["city[]"][0].options[1]=new Option("오사카") 
+    document.main["city[]"][0].options[1].value="2" 
+    document.main["city[]"][0].options[2]=new Option("고베") 
+    document.main["city[]"][0].options[2].value="3" 
+  } 
+} 
+</script> 
+
+<? 
+  include "index.php"; 
+  
+  $races = $_POST['country']; 
+  $citys = $_POST['city']; 
+  $ranks = $_POST['rank']; 
+?> 
+
+<form name="main" method="post" action="question.php" onSubmit="change("country[]")"> 
+    <table> 
+    <tr> 
+        <td> 
+          <select name="country[]" onchange="change(this.value)"> 
+            <option value=1>한국</option> 
+            <option value=2>일본</option> 
+          </select> 
+        </td> 
+                
+        <td> 
+          <select name="city[]"> 
+            <option value=1>서울</option> 
+            <option value=2>대전</option> 
+            <option value=3>대구</option> 
+          </select> 
+        </td> 
+        
+        <td> 
+          <select name="rank[]"> 
+            <option value=1 <?if($ranks[0]==1) echo "selected"?>>1</option> 
+            <option value=2 <?if($ranks[0]==2) echo "selected"?>>2</option> 
+            <option value=3 <?if($ranks[0]==3) echo "selected"?>>3</option> 
+          </select> 
+        </td>      
+    </tr> 
+    </table> 
+  <br/> 
+  <input type="submit" name="submit" value="입력" /> 
+</form> 

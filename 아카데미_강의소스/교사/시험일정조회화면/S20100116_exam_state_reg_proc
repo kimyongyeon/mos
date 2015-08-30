@@ -1,0 +1,339 @@
+<?php
+	// ================================================================
+	// 프로그램 코드명 : exam_state_reg_proc.php
+	// 작성자          : 김용연
+	// 프로그램 설명   : 현재 등록정보 다음, 건너뛰기 데이터를 처리한다.
+	// 파라미터 형식 :  //http://www.academysoft.kr/apps/exam/exam_state_reg_proc.php?p_command=skip&p_userid=toyongyeon&p_starttime=20100116113120
+	//&p_endtime=20100116113120&p_takecnt=1&p_curqstseq=1&p_examwrong=333&p_regilsi=20100116231552&p_updateilsi=20100116090000
+	// ================================================================
+	// 시컨스 데이터 항목
+	//=================================================================
+	// $p_command;    // 버튼 이벤트(건너뛰기, 시작, 다음) : skip, start, next
+    // $p_bookid;     // 북 아이디 (예 : 2010_M3PC1)
+    // $p_examid;     // 시험 아이디 (예: 
+    // $p_examseq;    // TB_EXAM_SCH.EXAM_SEQ
+    // $p_userid;     // TB_EXAM_REC.USER_ID
+    // $p_examschseq; // TB_EXAM_REC.EXAM_SCH_SEQ
+	// ================================================================
+    // 저장 데이터 항목
+	// ================================================================
+	// $p_skipno;     // SKIP 문제번호 : 1,2,3,1,2,3....
+	// $p_curqstseq;  // 현재문제 번호 : 1
+	// $p_examwrong;  // 틀린문제 해설 : " ", "다음 문제를 제출하시오."
+	// $p_curjumsu;   // 현재점수      : 20
+	// ================================================================
+	// 서버 관리 항목
+	// ================================================================
+	// $p_regilsi;    // 등록일시(서버에서 처리) : 20100116130000
+	// $p_updateilsi; // 수정일시(서버에서 처리) : 20100116130000
+	// $p_starttime;  // 시험시작시간            : 20100116130000  
+	// $p_endtime;    // 시작끝시간              : 20100116130000
+	// $p_retake;     // 재시험 횟수             : 1
+	// ================================================================
+	// include Common Library
+	$_zb_path = "/home/hosting_users/academysoft/www/bbs/";
+	include $_zb_path."outlogin.php";   	
+	include $_zb_path."../commonLib.php";	
+
+//	echo "receive data list <BR>";
+//	echo $g_command, $g_userid, $g_starttime, $g_endtime, $g_retakecnt, $g_curqstseq, $g_examwrong, $g_regilsi, $g_updateilsi;
+
+	func_db_man(); // DB 연결
+
+	if($p_command == "skip") // 건너뛰기 클릭시
+	{
+		func_reg_Skip($p_bookid, $p_examid, $p_examseq, $p_userid, $p_examschseq, $p_skipno);
+		echo "<br>skip update success...!";
+	}
+	else
+	if($p_command == "next") // 다음 클릭시
+	{
+		func_reg_Next($p_bookid, $p_examid, $p_examseq, $p_userid, $p_examschseq, $p_curqstseq, $p_examwrong, $p_curjumsu);
+    	echo "<br>next update success...!";
+	}
+	else
+	if($p_command == "start") // 시작 클릭시(재시험)
+	{
+		func_reg_Start($p_bookid, $p_examid, $p_examseq, $p_userid, $p_examschseq, $p_retake);
+	}
+
+	function fun_reg_Start($bookid, $examid, $examseq, $userid, $examschseq)
+	{
+        $sql = "SELECT r.RETAKE_CNT "
+             ." FROM TB_EXAM_SCH s, TB_EXAM e, TB_EXAM_REC r "
+			 ." WHERE s.EXAM_SEQ = '$examseq' "
+			 ." AND r.USER_ID = '$userid' "
+			 ." AND r.EXAM_SCH_SEQ = '$examschseq' ";
+
+		$res = $db->query($sql);
+		if (PEAR::isError($db)) {
+		die($db->getMessage());
+		}
+
+		$r_retakecnt = $row[0];
+
+		if ($r_retakecnt < 1)
+		{
+			$r_retakecnt = 1;
+
+			// TB_EXAM 테이블 추가사항 : SEQ, REG_ILSI, CUR_QST_SEQ
+			$sth = $db->prepare("INSERT INTO TB_EXAM (SEQ, REG_ILSI) values (?,?)");
+			$data = array($examseq, $reg_ilsi);
+			$db->execute($sth, $data );  
+			if (PEAR::isError($db)) {
+			die($db->getMessage());
+
+			$res = date('Y:M:d - H:i:s');
+			// insert
+			$sth = $db->prepare("INSERT INTO TB_EXAM_REC (RETAKE_CNT, EXAM_START) values (?,?)");
+			$data = array($r_retakecnt, $res);
+			$db->execute($sth, $data );  
+			if (PEAR::isError($db)) {
+			die($db->getMessage());
+		}
+		else
+		{
+			$r_retakecnt = $r_retakecnt + 1;
+			// update
+			$sth = $db->prepare("UPDATE TB_EXAM_REC SET RETAKE_CNT = ? WHERE SEQ = ?");
+			$data = array($r_retakecnt, $examschseq);
+			$db->execute($sth, $data ); 
+		}
+	}
+
+	function func_reg_Skip($bookid, $examid, $examseq, $userid, $examschseq, $skipno)
+	{
+        $sql = "SELECT s.EXAM_SEQ, e.SEQ, r.EXAM_SCH_SEQ, r.SKIN_NO  "
+			."  FROM TB_EXAM_SCH s, TB_EXAM e, TB_EXAM_REC r "
+			." WHERE s.EXAM_SEQ = 'examseq' "
+			." AND r.USER_ID = 'userid' ";
+			." AND r.EXAM_SCH_SEQ = 'examschseq' ";
+
+		$res = $db->query($sql);
+		if (PEAR::isError($db)) {
+		die($db->getMessage());
+		}
+
+		$s_seq		  = $row[0]; // s.seq
+		$e_seq		  = $row[1]; // e.seq
+		$r_seq		  = $row[2]; // e.seq
+		$reg_ilsi     = date('Y:M:d - H:i:s');
+
+		$arr = array($row[3]); // 문제번호 추가
+		$res = explode(",", $arry);
+
+		if ($s_seq == NULL or $e_seq == NULL or $r_seq == NULL)
+		{
+			// TB_EXAM 테이블 추가사항 : SEQ, REG_ILSI, CUR_QST_SEQ
+			$sth = $db->prepare("INSERT INTO TB_EXAM (SEQ, REG_ILSI, CUR_QST_SEQ) values (?,?,?)");
+			$data = array($examseq, $reg_ilsi, $curqstseq);
+			$db->execute($sth, $data );  
+			if (PEAR::isError($db)) {
+			die($db->getMessage());
+
+			// TB_EXAM_REC 추가사항 : EXAM_SCH_SEQ, SEQ, SKIP_NO
+			$sth = $db->prepare("INSERT INTO TB_EXAM_REC (EXAM_SCH_SEQ, REG_ILSI, SKIP_NO) values (?,?,?)");
+			$data = array($examschseq, $res);
+			$db->execute($sth, $data );  
+			if (PEAR::isError($db)) {
+			die($db->getMessage());
+			}
+		}
+		else
+		{
+			// 수정
+			$sth = $db->prepare("UPDATE TB_EXAM_REC SET SKIP_NO = ?, CUR_QST_SEQ = ?, EXAM_START = ?, EXAM_END = ?, UPDATE_ILSI = ?, WHERE EXAM_SCH_SEQ = ?");
+			$data = array($res, $curqstseq, $starttime, $endtime, $reg_ilsi, $examschseq);
+			$db->execute($sth, $data );
+		}
+	}
+
+	function func_reg_Next($bookid, $examid, $examseq, $userid, $examschseq, $starttime, $endtime, $curqstseq, $examwrong, $curjumsu, $skipno)
+	{
+		// select 문제번호를 불러온다.
+		$sql = "SELECT r.SKIP_NO"
+			."  FROM TB_EXAM_SCH s, TB_EXAM e, TB_EXAM_REC r "
+			." WHERE s.EXAM_SEQ = 'examseq' "
+			." AND r.USER_ID = 'userid' ";
+			." AND r.EXAM_SCH_SEQ = 'examschseq' ";
+
+		$res = $db->query($sql);
+		if (PEAR::isError($db)) {
+		die($db->getMessage());
+		}
+
+		$res = explode(" ", $row[0]);
+
+		// 문제번호를 초기화 시킨다.
+		while($i < sizeof($res)) {
+			if ($res[$i] == $skipno) {
+				$res[$i] = 0;
+			}
+			$i++;
+		}
+
+		// 수정
+		$sth = $db->prepare("UPDATE TB_EXAM_REC SET SKIP_NO = ? WHERE EXAM_SCH_SEQ = ?");
+		$data = array($res, $examschseq);
+		$db->execute($sth, $data );   
+	}
+	
+	// DB 관리
+	function func_db_man()
+	{
+		// 권한 검사
+		$connect=dbConn();
+		$member=member_info();
+
+		call_pear_init();
+		require_once("DB.php");  
+
+		// DB 접속
+		$db =& DB::connect(call_pear_db_dsn());
+		if (PEAR::isError($db)) {
+			die($db->getMessage()); 
+		}
+	}
+
+
+	// ================================================================
+
+	// ================================================================
+	//  등록 클래스
+	// ================================================================
+//	class user_stateRegproc
+//	{
+//		private $m_data;
+
+//		private $m_commnad;      // 버튼 이벤트(건너뛰기, 다시, 다음) : skip, retry, next
+//		private $m_userid;       // 사용자ID
+//		private $m_starttime;    // 시험시작시간
+//		private $m_endtime;      // 시작끝시간
+//		private $m_retakecnt;    // 문제번호 누적
+//		private $m_curqstseq;    // 현재문제 번호
+//		private $m_examwrong;    // 틀린문제 해설
+//		private $m_regilsi;      // 등록일시
+//		private $m_updateilsi;   // 수정일시
+
+		// 초기화(생성자)
+//		function __construct($userid, $starttime, $endtime, $retakecnt, $curqstseq, $examwrong, $regilsi, $updateilsi)
+//		{
+//			// 전역변수 p_command를 참조하도록 global을 선언한다.
+//			global $g_command; 
+//			$this->$m_commnad = $g_command;
+
+			// DB 관리
+//			$this->func_db_man(); 
+//
+//			if($g_command == "skip")
+//			{
+//				$this->func_reg_Skip($userid, $starttime, $endtime, $retakecnt, 
+//					                 $curqstseq, $examwrong, $regilsi, $updateilsi);
+//			}
+//			if($g_command == "next")
+//			{
+//				$this->func_reg_Next($userid, $retakecnt);
+//			}
+//		}
+
+//		function __get($name)
+//		{
+//			return isset($this->$m_data[$name]) ? $this->$m_data[$name] : NULL;
+//		}
+//
+//		function __set($name, $value)
+//		{
+//			if(in_array($name, array("userid", "starttime", "endtime", "retakecnt", "curqstseq", "examwrong", "regilsi", "updateilsi")))
+//			{
+//				if(!strcmp($name, "userid")) // 사용자ID
+//					$value = ($value != NULL && $value != "") ? $value : 0;
+//				if(!strcmp($name, "starttime")) // 시험시작시간
+//					$value = ($value >= 1 && $value =< 60) ? $value : 0;
+//				if(!strcmp($name, "endtime")) // 시험끝시간
+//					$value = ($value >= 1 && $value < 60) ? $value : 0;
+//				if(!strcmp($name, "retakecnt")) // 문제번호누적
+//					$value = ($value >= 1 && $value =< 20) ? $value : 0;
+//				if(!strcmp($name, "curqstseq")) // 현재문제번호 
+//					$value = ($value >= 1 && $value =< 20) ? $value : 0;
+//				if(!strcmp($name, "examwrong")) // 틀린문제해설
+//					$value = ($value != NULL) ? $value : 0;
+//				if(!strcmp($name, "regilsi")) // 등록일시
+//					$value = ($value > 0 && $value =< 31) ? $value : 0;
+//				if(!strcmp($name, "updateilsi")) // 수정일시
+//					$value = ($value > 0 && $value =< 31) ? $value : 0;
+//
+//				$this->$m_data[$name] = $value;
+//			}
+//		}
+
+		// 건너뛰기 
+//		public function func_reg_Skip($userid, $starttime, $endtime, $retakecnt, $curqstseq, $examwrong, $regilsi, $updateilsi)
+//		{
+//			$qno_array = implode(',',$retakecnt); // 문제번호 추가
+//	
+//			// TB_EXAM_REC RECORD UPDATE
+//			$sth = $db->prepare("UPDATE TB_EXAM_REC SET PLAN_ILSI = ? WHERE SEQ = ?");
+//			$data = array($p_plan_ilsi, $p_seq);
+//			$db->execute($sth, $data );   
+//		}
+//
+//		// 다음
+//		public function func_reg_Next($userid, $retakecnt)
+//		{
+//			// 해당 문제번호를 검색하기 위해
+//			for($i=1; $i<=20; $i++)
+//			{
+//				$tqno_array = implode(',',$i);
+//			}
+//
+//			// select 문제번호를 불러온다.
+//
+//			$qno_array = explode(',',$qno);
+//
+//			// 문제번호를 초기화 시킨다.
+//			for($i=0; $i<20; $i++)
+//			{
+//				if($qno_array[$i] == $tqno_array[$i])
+//				{
+//					$qno_array[$i] = 0;
+//					$i = 0;
+//				}
+//			}
+//
+//			// TB_EXAM_REC RECORD UPDATE
+//			$sth = $db->prepare("UPDATE TB_EXAM_REC SET PLAN_ILSI = ? WHERE SEQ = ?");
+//			$data = array($p_plan_ilsi, $p_seq);
+//			$db->execute($sth, $data );   
+//		}
+//		
+//		// DB 관리
+//		private function func_db_man()
+//		{
+//			// 권한 검사
+//			$connect=dbConn();
+//			$member=member_info();
+//
+//			call_pear_init();
+//			require_once("DB.php");  
+//
+//			// DB 접속
+//			$db =& DB::connect(call_pear_db_dsn());
+//			if (PEAR::isError($db)) {
+//				die($db->getMessage()); 
+//			}
+//		}
+
+//		public function ShowData()
+//		{
+//			echo "m_commnad : $this->m_commnad<BR>";
+//		}
+//	}
+
+
+
+	// user_id UPDATE 및 INSERT 처리
+//	$user_reg = new user_stateRegproc($g_userid, $g_starttime, $g_endtime, $g_retakecnt, 
+//	                                  $g_curqstseq, $g_examwrong, $g_regilsi, $g_updateilsi);
+//	$user_reg->ShowData();
+?>
+

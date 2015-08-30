@@ -1,0 +1,25 @@
+<html>
+<link href="../css/global.css" rel="stylesheet" type="text/css">
+
+<table width="720" cellpadding="5" cellspacing="1" bgcolor="cccccc">
+  <tr>
+    <td width="30" align="center" bgcolor="efefef" class="title01b"> 회</td>
+    <td width="370" align="center" bgcolor="efefef" class="title01b"> 시험제목</td>
+    <td width="60" align="center" bgcolor="efefef" class="title01b"> 시험계획일</td>
+    <td width="100" align="center" bgcolor="efefef" class="title01b"> 관리</td>
+  </tr>
+  <!-- BEGIN row -->
+  <tr>
+	<form method = "post" action = "/apps/exam/exam_sch_update_ok.php" border = 0>
+	<input type="hidden" name="p_seq" value="{P_SEQ}">	
+	<input type="hidden" name="p_exam_seq" value="{P_EXAM_SEQ}">
+    <td width="30" align="center" bgcolor="ffffff"> {SEQ}</td>
+    <td width="370" align="center" bgcolor="ffffff">{EXAM_TITLE}</td>
+    <td width="60" align="center" bgcolor="ffffff"><input type = "text" name = "p_plan_ilsi"  value = "{PLAN_ILSI}" maxlength="10" size="10"></td>
+    <td width="100" align="center" bgcolor="ffffff"><input type = "submit" value = "수정">
+	<a href="{SCRIPT_DELETE}">삭제</a></td>
+  	</form>
+  </tr>
+  <!-- END row -->
+</table>
+</html> 
